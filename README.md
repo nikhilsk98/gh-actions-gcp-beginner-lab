@@ -115,10 +115,10 @@ Based on the MLOps course lab: [Labs/Github_Labs/Lab3](https://github.com/raminm
 
 ## Results
 
-The manually triggered run passed every step. On the fixed 80/20 split (`random_state=42`) the model reached a test accuracy of **1.0000**, and the model was uploaded to:
+The manually triggered [workflow run](https://github.com/nikhilsk98/gh-actions-gcp-beginner-lab/actions/runs/42170337128/attempts/2) passed every step. On the fixed 80/20 split (`random_state=42`) the model reached a test accuracy of **1.0000**, and the model was uploaded to:
 
 ```
-gs://gh-actions-lab-j4roqu-models/models/model_20261106_054628.joblib
+gs://gh-actions-lab-j4roqu-models/models/model_20261106_060811.joblib
 ```
 
 ## Screenshots
