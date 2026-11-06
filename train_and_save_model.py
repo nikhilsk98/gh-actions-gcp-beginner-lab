@@ -1,4 +1,5 @@
 import io
+import json
 import os
 from datetime import datetime, timezone
 
@@ -91,21 +92,27 @@ def build_metrics(cv_results, best_name, y_test, y_pred, timestamp):
     }
 
 
-def save_model_to_gcs(model, bucket_name, blob_name):
-    """Serialize the model in memory and upload it to GCS.
+def upload_artifacts(model, metrics, bucket_name, model_blob, metrics_blob):
+    """Upload the model (serialized in memory) and the metrics report to GCS.
 
     Errors are not swallowed, so a failed upload fails the workflow run.
     """
     from google.cloud import storage
 
+    bucket = storage.Client().bucket(bucket_name)
+
     buffer = io.BytesIO()
     joblib.dump(model, buffer)
     buffer.seek(0)
+    bucket.blob(model_blob).upload_from_file(
+        buffer, content_type="application/octet-stream"
+    )
+    print(f"Model uploaded to gs://{bucket_name}/{model_blob}")
 
-    client = storage.Client()
-    blob = client.bucket(bucket_name).blob(blob_name)
-    blob.upload_from_file(buffer, content_type="application/octet-stream")
-    print(f"Model uploaded to gs://{bucket_name}/{blob_name}")
+    bucket.blob(metrics_blob).upload_from_string(
+        json.dumps(metrics, indent=2), content_type="application/json"
+    )
+    print(f"Metrics uploaded to gs://{bucket_name}/{metrics_blob}")
 
 
 def main():
@@ -126,15 +133,19 @@ def main():
     print(f"Test macro F1: {metrics['test_macro_f1']:.4f}")
     print(f"Confusion matrix: {metrics['confusion_matrix']}")
 
-    blob_name = f"models/model_{ts}.joblib"
+    model_blob = f"models/model_{ts}.joblib"
+    metrics_blob = f"metrics/metrics_{ts}.json"
 
     if skip_upload:
         joblib.dump(model, "model.joblib")
-        print(f"SKIP_GCS_UPLOAD set: saved locally to model.joblib "
-              f"(would upload to gs://{bucket_name}/{blob_name})")
+        with open("metrics.json", "w") as f:
+            json.dump(metrics, f, indent=2)
+        print("SKIP_GCS_UPLOAD set: saved model.joblib and metrics.json locally")
+        print(f"  would upload gs://{bucket_name}/{model_blob}")
+        print(f"  would upload gs://{bucket_name}/{metrics_blob}")
         return
 
-    save_model_to_gcs(model, bucket_name, blob_name)
+    upload_artifacts(model, metrics, bucket_name, model_blob, metrics_blob)
 
 
 if __name__ == "__main__":
