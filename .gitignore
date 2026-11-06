@@ -1,26 +1,23 @@
-# Service account keys
+# Service account keys and credentials
 *.json
+.env
+.env.*
 
-# macOS system files
-.DS_Store
+# Model artifacts
+*.joblib
+*.pkl
 
-# Python bytecode
+# Python
 __pycache__/
 *.py[cod]
+venv/
+.venv/
 
-# Jupyter Notebook
+# Jupyter
 .ipynb_checkpoints/
 
-# Virtual environment
-venv/
-*.venv/
-
-# Operating System generated files
+# OS / editor files
+.DS_Store
 Thumbs.db
 ehthumbs.db
-
-# VSCode
 .vscode/
-
-# Ignore model files
-*.joblib
