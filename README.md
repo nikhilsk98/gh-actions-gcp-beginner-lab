@@ -127,11 +127,12 @@ Based on the MLOps course lab: [Labs/Github_Labs/Lab3](https://github.com/raminm
 - **Failed uploads fail the run.** Upload exceptions are not caught, so a GCS problem turns the workflow red instead of passing silently.
 - **Local test mode.** `SKIP_GCS_UPLOAD=1` trains the model and saves the model and metrics locally, without needing GCP credentials.
 - **Workflow matches the lab README.** I renamed the file to `train-and-upload.yml` and re-enabled the daily cron trigger, which was commented out in the template.
+- **Pinned dependencies.** `requirements.txt` pins exact versions of pandas, scikit-learn, google-cloud-storage, numpy, scipy and joblib, taken from what CI installed on Python 3.10. This makes local and CI results match, and the pip cache key now changes only when I change a version on purpose.
 - **Broader `.gitignore`.** It now covers JSON keys, `.env` files, and `*.joblib` / `*.pkl` model artifacts.
 
 ## Results
 
-The manually triggered [workflow run](https://github.com/nikhilsk98/gh-actions-gcp-beginner-lab/actions/runs/42173896823) passed every step. Cross-validation results from that run (Python 3.10, scikit-learn 1.7.2):
+The manually triggered [workflow run](https://github.com/nikhilsk98/gh-actions-gcp-beginner-lab/actions/runs/42174480152) passed every step. Cross-validation results from that run (Python 3.10, scikit-learn 1.7.2):
 
 | Model | 5-fold CV accuracy (mean ± std) |
 |---|---|
@@ -155,11 +156,11 @@ A perfect score on 36 test samples is plausible for Wine, but the CV estimate (a
 Artifacts uploaded by this run:
 
 ```
-gs://gh-actions-lab-j4roqu-models/models/model_20261106_062154.joblib
-gs://gh-actions-lab-j4roqu-models/metrics/metrics_20261106_062154.json
+gs://gh-actions-lab-j4roqu-models/models/model_20261106_062723.joblib
+gs://gh-actions-lab-j4roqu-models/metrics/metrics_20261106_062723.json
 ```
 
-Note: `requirements.txt` doesn't pin versions. When I ran it locally with scikit-learn 1.9.1, gradient boosting scored 0.9236 instead of 0.9094. The other two models and the final choice were the same.
+Before I pinned dependencies, my local run with scikit-learn 1.9.1 gave gradient boosting 0.9236 instead of CI's 0.9094. After pinning `requirements.txt` to CI's versions, my local run (Python 3.11) and CI (Python 3.10) produce identical CV scores.
 
 ## Screenshots
 
