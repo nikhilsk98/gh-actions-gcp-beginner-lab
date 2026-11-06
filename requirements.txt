@@ -1,3 +1,7 @@
-pandas
-scikit-learn
-google-cloud-storage
+# Pinned to the versions installed by CI on Python 3.10 (ubuntu-latest)
+pandas==2.3.3
+scikit-learn==1.7.2
+google-cloud-storage==3.17.1
+numpy==2.2.6
+scipy==1.15.3
+joblib==1.6.0
